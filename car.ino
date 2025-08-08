@@ -1,13 +1,20 @@
+#include <Servo.h> //서보모터 라이브러리
 const int TRIG1 = 9;
 const int ECHO1 = 8;
-const int IN1 = 7; //후륜으로 바퀴 2개 이용 & L298N 사용하여 제어
+const int IN1 = 7; 
 const int IN2 = 6;
 const int ENA = 5;
 const int TRIG2 = 4;
 const int ECHO2 = 3;
+const int sw1 = 2; //좌회전 버튼
+const int sw2 = 10; //우회전 버튼
+const int servopin = 11; //피니언 역할을 하는 서보모터
+
+Servo servo_piniun; //서보모터 객체 생성
+int currentAngle = 90;  // 시작 각도 (중간)
 
 void setup() {
-  Serial.begin(9600); //통신속도
+  Serial.begin(9600); 
   pinMode(TRIG1,OUTPUT);
   pinMode(ECHO1,INPUT);
   pinMode(TRIG2,OUTPUT);
@@ -15,10 +22,14 @@ void setup() {
   pinMode(IN1,OUTPUT);
   pinMode(IN2,OUTPUT);
   pinMode(ENA,OUTPUT);
+  pinMode(sw1,INPUT);
+  pinMode(sw2,INPUT);
+  servo_piniun.attach(servopin); //서보모터 핀 설정
+  servo_piniun.write(currentAngle); //서보모터 핀 설정
 }
 
 void loop() {
- long duration1, distance1;   //long == int라 생각 대신 저장 공간이 더 많은
+ long duration1, distance1;  
  digitalWrite(TRIG1, LOW); 
  delayMicroseconds(2); 
  digitalWrite(TRIG1, HIGH); 
@@ -26,10 +37,10 @@ void loop() {
  digitalWrite(TRIG1, LOW); 
  duration1 = pulseIn (ECHO1, HIGH);
   
- distance1 = duration1 * 17 / 1000; //초음파가 이동한 거리를 cm으로 변환하는 공식
+ distance1 = duration1 * 17 / 1000;
 
 
- Serial.println(duration1 ); //시리얼 모니터에 표시하는 것
+ Serial.println(duration1 ); 
  Serial.print("\nDIstance1 : "); 
  Serial.print(distance1);  
  Serial.println(" Cm"); 
@@ -53,29 +64,43 @@ void loop() {
  delay(1000); 
 
 
- if(distance1 < 5) //벽과의 거리를
+ if(distance1 < 5)
  {
   digitalWrite(IN1, LOW); 
  digitalWrite(IN2, HIGH);
  analogWrite(ENA, 200);
  }else {
-  // 5cm 이상일 때
-  digitalWrite(IN1, HIGH); //L298N 사용해서 정방향 이동 속도는 200으로 한 것
+  digitalWrite(IN1, HIGH); 
   digitalWrite(IN2, LOW);
   analogWrite(ENA, 200);
 }
 
-if(distance2 > 5) //바닥과의 거리를
+if(distance2 > 5)
  {
   digitalWrite(IN1, LOW); 
  digitalWrite(IN2, HIGH);
  analogWrite(ENA, 200);
  }else {
-  // 5cm 이하일 때
-  digitalWrite(IN1, HIGH); //L298N 사용해서 정방향 이동 속도는 200으로 한 것
+  digitalWrite(IN1, HIGH);
   digitalWrite(IN2, LOW);
   analogWrite(ENA, 200);
 }
+
+
+if (digitalRead(sw1) == HIGH) {
+    if (currentAngle < 180) {
+      currentAngle++;
+      servo_piniun.write(currentAngle); //.write는 모터 움직이는 명령어
+      delay(15);  // 서보가 움직일 시간
+    }
+  } else if (digitalRead(sw2) == HIGH) {
+    if (currentAngle > 0) {
+      currentAngle--;
+      servo_piniun.write(currentAngle);
+      delay(15);
+    }
+  }
+  // 둘 다 안 눌렀으면 각도 변화 없음 누를때만 작동
 
 
 }
