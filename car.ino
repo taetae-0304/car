@@ -9,7 +9,7 @@ const int ECHO2 = 3;
 const int sw1 = 2; 
 const int sw2 = 10; 
 const int servopin = 11; 
-const int TRIG3 = 12; //후방센서
+const int TRIG3 = 12; 
 const int ECHO3 = 13;
 
 Servo servo_piniun; 
@@ -105,6 +105,12 @@ if(distance2 > 5)
   digitalWrite(IN1, HIGH);
   digitalWrite(IN2, LOW);
   analogWrite(ENA, 200);
+}
+
+if(distance3 < 10) //후방 충돌시 압사를 막기 위하여
+{
+  servo_piniun.write(180);
+  delay(1);
 }
 
 
