@@ -1,4 +1,4 @@
-#include <Servo.h> //서보모터 라이브러리
+#include <Servo.h> 
 const int TRIG1 = 9;
 const int ECHO1 = 8;
 const int IN1 = 7; 
@@ -6,12 +6,14 @@ const int IN2 = 6;
 const int ENA = 5;
 const int TRIG2 = 4;
 const int ECHO2 = 3;
-const int sw1 = 2; //좌회전 버튼
-const int sw2 = 10; //우회전 버튼
-const int servopin = 11; //피니언 역할을 하는 서보모터
+const int sw1 = 2; 
+const int sw2 = 10; 
+const int servopin = 11; 
+const int TRIG3 = 12; //후방센서
+const int ECHO3 = 13;
 
-Servo servo_piniun; //서보모터 객체 생성
-int currentAngle = 90;  // 시작 각도 (중간)
+Servo servo_piniun; 
+int currentAngle = 90;  
 
 void setup() {
   Serial.begin(9600); 
@@ -24,8 +26,10 @@ void setup() {
   pinMode(ENA,OUTPUT);
   pinMode(sw1,INPUT);
   pinMode(sw2,INPUT);
-  servo_piniun.attach(servopin); //서보모터 핀 설정
-  servo_piniun.write(currentAngle); //서보모터 핀 설정
+  servo_piniun.attach(servopin); 
+  servo_piniun.write(currentAngle); 
+  pinMode(TRIG3,OUTPUT);
+  pinMode(ECHO3,INPUT);
 }
 
 void loop() {
@@ -63,6 +67,23 @@ void loop() {
  Serial.println(" Cm"); 
  delay(1000); 
 
+ long duration3, distance3;  
+ digitalWrite(TRIG3, LOW); 
+ delayMicroseconds(2); 
+ digitalWrite(TRIG3, HIGH); 
+ delayMicroseconds(10); 
+ digitalWrite(TRIG3, LOW); 
+ duration3 = pulseIn (ECHO3, HIGH);
+  
+ distance3 = duration3 * 17 / 1000;
+
+
+ Serial.println(duration3 ); 
+ Serial.print("\nDIstance3 : "); 
+ Serial.print(distance3);  
+ Serial.println(" Cm"); 
+ delay(1000); 
+
 
  if(distance1 < 5)
  {
@@ -90,8 +111,8 @@ if(distance2 > 5)
 if (digitalRead(sw1) == HIGH) {
     if (currentAngle < 180) {
       currentAngle++;
-      servo_piniun.write(currentAngle); //.write는 모터 움직이는 명령어
-      delay(15);  // 서보가 움직일 시간
+      servo_piniun.write(currentAngle); 
+      delay(15);
     }
   } else if (digitalRead(sw2) == HIGH) {
     if (currentAngle > 0) {
@@ -100,7 +121,6 @@ if (digitalRead(sw1) == HIGH) {
       delay(15);
     }
   }
-  // 둘 다 안 눌렀으면 각도 변화 없음 누를때만 작동
 
 
 }
